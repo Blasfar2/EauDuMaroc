@@ -2,6 +2,12 @@
 
 An e-commerce website for water filtration systems in Morocco, featuring osmosis systems (osmoseurs) and water filters.
 
+## 🌐 Live Demo
+
+**[View Live Website](https://blasfar2.github.io/test13/)** *(Deploy via GitHub Pages to activate)*
+
+> To enable the live website: Go to Repository Settings → Pages → Source: Select branch → Save
+
 ## Features
 
 - **Product Catalog**: Display of various water filtration products including:

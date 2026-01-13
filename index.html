@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EauDuMaroc - Systèmes de Filtration d'Eau au Maroc</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>💧 EauDuMaroc</h1>
+                <p class="tagline">Eau Pure pour un Maroc Sain</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#accueil">Accueil</a></li>
+                    <li><a href="#produits">Produits</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#panier" class="cart-link">🛒 Panier (<span id="cart-count">0</span>)</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section id="accueil" class="hero">
+        <div class="container">
+            <h2>Solutions de Filtration d'Eau Premium au Maroc</h2>
+            <p>Systèmes d'osmose inverse et filtres à eau de qualité supérieure</p>
+        </div>
+    </section>
+
+    <section id="filtres" class="filters">
+        <div class="container">
+            <h3>Filtrer les Produits</h3>
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label>Type de Produit:</label>
+                    <select id="type-filter">
+                        <option value="tous">Tous</option>
+                        <option value="osmoseur">Osmoseur</option>
+                        <option value="filtre">Filtre à Eau</option>
+                        <option value="cartouche">Cartouche</option>
+                        <option value="accessoire">Accessoire</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Couleur de l'Eau:</label>
+                    <select id="color-filter">
+                        <option value="tous">Tous</option>
+                        <option value="blanc">Eau Blanche/Claire</option>
+                        <option value="couleur">Eau Colorée</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Ville:</label>
+                    <select id="location-filter">
+                        <option value="tous">Tout le Maroc</option>
+                        <option value="casablanca">Casablanca</option>
+                        <option value="rabat">Rabat</option>
+                        <option value="marrakech">Marrakech</option>
+                        <option value="fes">Fès</option>
+                        <option value="tanger">Tanger</option>
+                        <option value="agadir">Agadir</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="produits" class="products">
+        <div class="container">
+            <h2>Nos Produits</h2>
+            <div id="products-grid" class="products-grid">
+                <!-- Products will be dynamically inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="panier-details" class="cart-section" style="display: none;">
+        <div class="container">
+            <h2>Votre Panier</h2>
+            <div id="cart-items"></div>
+            <div class="cart-total">
+                <h3>Total: <span id="cart-total">0</span> MAD</h3>
+                <button class="btn-checkout">Commander Maintenant</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Contactez-nous</h2>
+            <p>📞 Téléphone: +212 5XX-XXXXXX</p>
+            <p>📧 Email: contact@eaudumaroc.ma</p>
+            <p>📍 Disponible dans tout le Maroc</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 EauDuMaroc - Systèmes de Filtration d'Eau au Maroc. Tous droits réservés.</p>
+            <p>Prix en Dirhams Marocains (MAD) - Livraison dans tout le Maroc</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

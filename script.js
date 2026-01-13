@@ -2,6 +2,10 @@
 class WaterAnimation {
     constructor() {
         this.canvas = document.getElementById('water-canvas');
+        if (!this.canvas) {
+            console.error('water-canvas element not found');
+            return;
+        }
         this.ctx = this.canvas.getContext('2d');
         this.waves = [];
         this.ripples = [];
@@ -61,6 +65,8 @@ class WaterAnimation {
     }
     
     drawWaves() {
+        const step = Math.max(2, Math.floor(this.canvas.width / 400));
+        
         this.waves.forEach(wave => {
             this.ctx.beginPath();
             this.ctx.fillStyle = wave.color;
@@ -69,7 +75,7 @@ class WaterAnimation {
             this.ctx.moveTo(0, 0);
             
             // Draw wavy line
-            for (let x = 0; x <= this.canvas.width; x += 5) {
+            for (let x = 0; x <= this.canvas.width; x += step) {
                 const y = wave.offset + 
                     Math.sin((x * wave.frequency) + (this.time * wave.speed)) * wave.amplitude +
                     Math.sin((x * wave.frequency * 0.5) + (this.time * wave.speed * 1.5)) * (wave.amplitude * 0.5);
@@ -93,7 +99,7 @@ class WaterAnimation {
             this.ctx.moveTo(0, this.canvas.height);
             
             // Draw wavy line
-            for (let x = 0; x <= this.canvas.width; x += 5) {
+            for (let x = 0; x <= this.canvas.width; x += step) {
                 const y = bottomOffset - 
                     Math.sin((x * wave.frequency) + (this.time * wave.speed * 0.8)) * wave.amplitude +
                     Math.sin((x * wave.frequency * 0.7) + (this.time * wave.speed * 1.2)) * (wave.amplitude * 0.5);
@@ -156,7 +162,7 @@ class WaterAnimation {
             // Bubble moves away from mouse
             let offsetX = 0;
             let offsetY = 0;
-            if (distance < 200) {
+            if (distance > 0 && distance < 200) {
                 const force = (200 - distance) / 200;
                 offsetX = -(dx / distance) * force * 30;
                 offsetY = -(dy / distance) * force * 30;

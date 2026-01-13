@@ -32,14 +32,38 @@ An e-commerce website for water filtration systems in Morocco, featuring osmosis
   - Mobile-friendly layout
   - Works on all devices
 
-## How to Use
+## How to Access the Website
 
-1. Open `index.html` in a web browser
-2. Browse the product catalog
-3. Use filters to find specific products
-4. Add items to cart
-5. Click on cart icon to view items
-6. Checkout when ready
+### Option 1: Open Directly (Simple)
+1. Download or clone this repository
+2. Open `index.html` directly in your web browser (double-click the file)
+3. The website will run locally in your browser
+
+### Option 2: Run with Local Server (Recommended)
+```bash
+# Using Python
+python3 -m http.server 8000
+
+# Using Node.js
+npx http-server
+
+# Then open: http://localhost:8000
+```
+
+### Option 3: Deploy Online
+Deploy to any static hosting service:
+- **GitHub Pages**: Enable in repository settings
+- **Netlify**: Drag and drop the files
+- **Vercel**: Connect your repository
+- **Cloudflare Pages**: Connect and deploy
+
+## How to Use the Website
+
+1. Browse the product catalog
+2. Use filters to find specific products by type, water color, or location
+3. Add items to cart by clicking "Ajouter au Panier"
+4. Click on cart icon (🛒) to view items
+5. Click "Commander Maintenant" to checkout
 
 ## Files
 

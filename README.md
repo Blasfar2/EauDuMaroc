@@ -4,7 +4,7 @@ An e-commerce website for water filtration systems in Morocco, featuring osmosis
 
 ## 🌐 Live Demo
 
-**[View Live Website](https://blasfar2.github.io/test13/)** *(Deploy via GitHub Pages to activate)*
+**[View Live Website](https://blasfar2.github.io/EauDuMaroc/)** *(Deploy via GitHub Pages to activate)*
 
 > To enable the live website: Go to Repository Settings → Pages → Source: Select branch → Save
 

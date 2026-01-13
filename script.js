@@ -267,8 +267,9 @@ function setupCartLink() {
     cartLink.addEventListener('click', function(e) {
         e.preventDefault();
         const cartSection = document.getElementById('panier-details');
-        cartSection.style.display = cartSection.style.display === 'none' ? 'block' : 'none';
-        if (cartSection.style.display === 'block') {
+        const isHidden = cartSection.style.display === 'none' || cartSection.style.display === '';
+        cartSection.style.display = isHidden ? 'block' : 'none';
+        if (isHidden) {
             cartSection.scrollIntoView({ behavior: 'smooth' });
         }
     });
@@ -280,15 +281,26 @@ function setupCartLink() {
 // Checkout
 function checkout() {
     if (cart.length === 0) {
-        alert('Votre panier est vide!');
+        showNotification('Votre panier est vide!');
         return;
     }
     
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    alert(`Merci pour votre commande!\n\nTotal: ${total} MAD\n\nNous vous contactons bientôt pour la livraison.`);
-    cart = [];
-    updateCart();
-    saveCartToStorage();
+    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const itemText = itemCount > 1 ? 'articles' : 'article';
+    
+    // Show success notification
+    showNotification(`✅ Commande confirmée! Total: ${total} MAD (${itemCount} ${itemText}). Nous vous contactons bientôt!`);
+    
+    // Clear cart after a brief delay to allow user to see the notification
+    setTimeout(() => {
+        cart = [];
+        updateCart();
+        saveCartToStorage();
+        // Hide cart section
+        const cartSection = document.getElementById('panier-details');
+        cartSection.style.display = 'none';
+    }, 2000);
 }
 
 // Show notification
@@ -305,14 +317,19 @@ function showNotification(message) {
         box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         z-index: 2000;
         animation: slideIn 0.3s ease;
+        max-width: 400px;
+        word-wrap: break-word;
     `;
     notification.textContent = message;
     document.body.appendChild(notification);
     
+    // Longer display time for longer messages
+    const displayTime = message.length > 50 ? 3500 : 2000;
+    
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => notification.remove(), 300);
-    }, 2000);
+    }, displayTime);
 }
 
 // Storage functions

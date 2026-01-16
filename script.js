@@ -1,21 +1,31 @@
 // Vanta.js Background Animation
 let vantaEffect;
 window.addEventListener('DOMContentLoaded', () => {
-    vantaEffect = VANTA.WAVES({
-        el: "#vanta-background",
-        mouseControls: true,
-        touchControls: true,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        scale: 1.00,
-        scaleMobile: 1.00,
-        color: 0x1e88e5,
-        shininess: 30.00,
-        waveHeight: 15.00,
-        waveSpeed: 0.75,
-        zoom: 0.75
-    });
+    // Check if VANTA is available
+    if (typeof VANTA === 'undefined') {
+        console.error('VANTA library not loaded');
+        return;
+    }
+    
+    try {
+        vantaEffect = VANTA.WAVES({
+            el: "#vanta-background",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x1e88e5,
+            shininess: 30.00,
+            waveHeight: 15.00,
+            waveSpeed: 0.75,
+            zoom: 0.75
+        });
+    } catch (error) {
+        console.error('Failed to initialize VANTA animation:', error);
+    }
 });
 
 // Product Database with Enhanced Information

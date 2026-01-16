@@ -1,209 +1,31 @@
-// Water Animation Canvas
-class WaterAnimation {
-    constructor() {
-        this.canvas = document.getElementById('water-canvas');
-        if (!this.canvas) {
-            console.error('water-canvas element not found');
-            return;
-        }
-        this.ctx = this.canvas.getContext('2d');
-        this.waves = [];
-        this.ripples = [];
-        this.mouse = { x: 0, y: 0 };
-        this.time = 0;
-        
-        this.resize();
-        this.initWaves();
-        this.setupEventListeners();
-        this.animate();
-    }
-    
-    resize() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-    }
-    
-    initWaves() {
-        // Create multiple wave layers for depth
-        this.waves = [
-            { amplitude: 30, frequency: 0.02, speed: 0.03, offset: 0, color: 'rgba(66, 165, 245, 0.15)' },
-            { amplitude: 25, frequency: 0.025, speed: 0.025, offset: 50, color: 'rgba(41, 182, 246, 0.12)' },
-            { amplitude: 20, frequency: 0.03, speed: 0.02, offset: 100, color: 'rgba(3, 169, 244, 0.1)' },
-            { amplitude: 15, frequency: 0.035, speed: 0.015, offset: 150, color: 'rgba(0, 188, 212, 0.08)' }
-        ];
-    }
-    
-    setupEventListeners() {
-        window.addEventListener('resize', () => this.resize());
-        
-        // Mouse move creates ripples
-        document.addEventListener('mousemove', (e) => {
-            this.mouse.x = e.clientX;
-            this.mouse.y = e.clientY;
-            
-            // Create ripple on mouse move (throttled)
-            if (Math.random() > 0.95) {
-                this.createRipple(e.clientX, e.clientY);
-            }
-        });
-        
-        // Click creates bigger ripples
-        document.addEventListener('click', (e) => {
-            this.createRipple(e.clientX, e.clientY, 80, 0.3);
-        });
-    }
-    
-    createRipple(x, y, maxRadius = 50, opacity = 0.2) {
-        this.ripples.push({
-            x: x,
-            y: y,
-            radius: 0,
-            maxRadius: maxRadius,
-            opacity: opacity,
-            speed: 2
-        });
-    }
-    
-    drawWaves() {
-        const step = Math.max(2, Math.floor(this.canvas.width / 400));
-        
-        this.waves.forEach(wave => {
-            this.ctx.beginPath();
-            this.ctx.fillStyle = wave.color;
-            
-            // Start from top
-            this.ctx.moveTo(0, 0);
-            
-            // Draw wavy line
-            for (let x = 0; x <= this.canvas.width; x += step) {
-                const y = wave.offset + 
-                    Math.sin((x * wave.frequency) + (this.time * wave.speed)) * wave.amplitude +
-                    Math.sin((x * wave.frequency * 0.5) + (this.time * wave.speed * 1.5)) * (wave.amplitude * 0.5);
-                this.ctx.lineTo(x, y);
-            }
-            
-            // Complete the fill
-            this.ctx.lineTo(this.canvas.width, 0);
-            this.ctx.closePath();
-            this.ctx.fill();
-        });
-        
-        // Draw bottom waves (inverted)
-        this.waves.forEach((wave, index) => {
-            this.ctx.beginPath();
-            this.ctx.fillStyle = wave.color;
-            
-            const bottomOffset = this.canvas.height - wave.offset - 100;
-            
-            // Start from bottom
-            this.ctx.moveTo(0, this.canvas.height);
-            
-            // Draw wavy line
-            for (let x = 0; x <= this.canvas.width; x += step) {
-                const y = bottomOffset - 
-                    Math.sin((x * wave.frequency) + (this.time * wave.speed * 0.8)) * wave.amplitude +
-                    Math.sin((x * wave.frequency * 0.7) + (this.time * wave.speed * 1.2)) * (wave.amplitude * 0.5);
-                this.ctx.lineTo(x, y);
-            }
-            
-            // Complete the fill
-            this.ctx.lineTo(this.canvas.width, this.canvas.height);
-            this.ctx.closePath();
-            this.ctx.fill();
-        });
-    }
-    
-    drawRipples() {
-        this.ripples = this.ripples.filter(ripple => {
-            // Draw ripple
-            const currentOpacity = ripple.opacity * (1 - ripple.radius / ripple.maxRadius);
-            
-            if (currentOpacity > 0.01) {
-                this.ctx.beginPath();
-                this.ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
-                this.ctx.strokeStyle = `rgba(66, 165, 245, ${currentOpacity})`;
-                this.ctx.lineWidth = 2;
-                this.ctx.stroke();
-                
-                // Inner ripple
-                if (ripple.radius > 10) {
-                    this.ctx.beginPath();
-                    this.ctx.arc(ripple.x, ripple.y, ripple.radius - 10, 0, Math.PI * 2);
-                    this.ctx.strokeStyle = `rgba(3, 169, 244, ${currentOpacity * 0.5})`;
-                    this.ctx.lineWidth = 1;
-                    this.ctx.stroke();
-                }
-                
-                // Expand ripple
-                ripple.radius += ripple.speed;
-                
-                return true;
-            }
-            
-            return false;
-        });
-    }
-    
-    drawBubbles() {
-        // Draw floating bubbles influenced by mouse
-        const bubbleCount = 5;
-        for (let i = 0; i < bubbleCount; i++) {
-            const x = (this.canvas.width / bubbleCount) * i + 
-                Math.sin(this.time * 0.02 + i) * 50;
-            const y = this.canvas.height * 0.5 + 
-                Math.sin(this.time * 0.03 + i * 2) * 100;
-            const radius = 3 + Math.sin(this.time * 0.05 + i) * 2;
-            
-            // Calculate distance from mouse
-            const dx = this.mouse.x - x;
-            const dy = this.mouse.y - y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            // Bubble moves away from mouse
-            let offsetX = 0;
-            let offsetY = 0;
-            if (distance > 0 && distance < 200) {
-                const force = (200 - distance) / 200;
-                offsetX = -(dx / distance) * force * 30;
-                offsetY = -(dy / distance) * force * 30;
-            }
-            
-            this.ctx.beginPath();
-            this.ctx.arc(x + offsetX, y + offsetY, radius, 0, Math.PI * 2);
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            this.ctx.fill();
-            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-            this.ctx.lineWidth = 1;
-            this.ctx.stroke();
-        }
-    }
-    
-    animate() {
-        // Clear canvas with gradient background
-        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-        gradient.addColorStop(0, '#e3f2fd');
-        gradient.addColorStop(0.5, '#bbdefb');
-        gradient.addColorStop(1, '#90caf9');
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Draw all elements
-        this.drawWaves();
-        this.drawBubbles();
-        this.drawRipples();
-        
-        // Increment time
-        this.time += 1;
-        
-        // Continue animation
-        requestAnimationFrame(() => this.animate());
-    }
-}
-
-// Initialize water animation when DOM is ready
-let waterAnimation;
+// Vanta.js Background Animation
+let vantaEffect;
 window.addEventListener('DOMContentLoaded', () => {
-    waterAnimation = new WaterAnimation();
+    // Check if VANTA is available
+    if (typeof VANTA === 'undefined') {
+        console.error('VANTA library not loaded');
+        return;
+    }
+    
+    try {
+        vantaEffect = VANTA.WAVES({
+            el: "#vanta-background",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x1e88e5,
+            shininess: 30.00,
+            waveHeight: 15.00,
+            waveSpeed: 0.75,
+            zoom: 0.75
+        });
+    } catch (error) {
+        console.error('Failed to initialize VANTA animation:', error);
+    }
 });
 
 // Product Database with Enhanced Information

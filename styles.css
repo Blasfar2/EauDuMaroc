@@ -11,17 +11,6 @@ body {
     position: relative;
 }
 
-/* Vanta Background */
-#vanta-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background: linear-gradient(180deg, #0a3d62 0%, #1a6fa8 100%);
-}
-
 .container {
     max-width: 1200px;
     margin: 0 auto;

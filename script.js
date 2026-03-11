@@ -10,6 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
         vantaEffect = VANTA.WAVES({
             el: "#vanta-background",
+            THREE: window.THREE,
             mouseControls: true,
             touchControls: true,
             gyroControls: false,
@@ -17,11 +18,11 @@ window.addEventListener('DOMContentLoaded', () => {
             minWidth: 200.00,
             scale: 1.00,
             scaleMobile: 1.00,
-            color: 0x0a3d62,
-            shininess: 80.00,
-            waveHeight: 20.00,
-            waveSpeed: 0.60,
-            zoom: 0.85
+            color: 0x0096c7,
+            shininess: 60.00,
+            waveHeight: 25.00,
+            waveSpeed: 0.75,
+            zoom: 0.75
         });
     } catch (error) {
         console.error('Failed to initialize VANTA animation:', error);

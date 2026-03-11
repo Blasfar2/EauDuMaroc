@@ -7,7 +7,12 @@
     "start": "npx live-server",
     "dev": "npx live-server"
   },
-  "keywords": ["water", "filtration", "morocco", "e-commerce"],
+  "keywords": [
+    "water",
+    "filtration",
+    "morocco",
+    "e-commerce"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {

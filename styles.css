@@ -819,6 +819,118 @@ footer p {
     box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
 }
 
+/* Checkout Modal */
+.checkout-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.checkout-modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.checkout-modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: #1976d2;
+}
+
+.checkout-summary {
+    color: #555;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+.checkout-field {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.checkout-field label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.checkout-field input,
+.checkout-field select,
+.checkout-field textarea {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    font-family: inherit;
+}
+
+.checkout-field input:focus,
+.checkout-field select:focus,
+.checkout-field textarea:focus {
+    outline: none;
+    border-color: #1976d2;
+}
+
+.checkout-field textarea {
+    resize: vertical;
+}
+
+.checkout-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-cancel-checkout {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+}
+
+.btn-cancel-checkout:hover {
+    background: #f5f5f5;
+}
+
+.btn-confirm-checkout {
+    flex: 2;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #1976d2, #42a5f5);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.btn-confirm-checkout:hover {
+    opacity: 0.9;
+}
+
 @media (max-width: 768px) {
     .modal-body {
         grid-template-columns: 1fr;
@@ -826,5 +938,9 @@ footer p {
     
     .products-grid {
         grid-template-columns: 1fr;
+    }
+
+    .checkout-actions {
+        flex-direction: column;
     }
 }

@@ -24,12 +24,13 @@ class WaterAnimation {
     }
     
     initWaves() {
-        // Create multiple wave layers for depth
+        // Create multiple wave layers for depth - each fills from wave crest to bottom
         this.waves = [
-            { amplitude: 30, frequency: 0.02, speed: 0.03, offset: 0, color: 'rgba(66, 165, 245, 0.15)' },
-            { amplitude: 25, frequency: 0.025, speed: 0.025, offset: 50, color: 'rgba(41, 182, 246, 0.12)' },
-            { amplitude: 20, frequency: 0.03, speed: 0.02, offset: 100, color: 'rgba(3, 169, 244, 0.1)' },
-            { amplitude: 15, frequency: 0.035, speed: 0.015, offset: 150, color: 'rgba(0, 188, 212, 0.08)' }
+            { amplitude: 70, frequency: 0.015, speed: 0.05,  yPos: 0.75, color: 'rgba(21, 101, 192, 0.55)' },
+            { amplitude: 60, frequency: 0.02,  speed: 0.04,  yPos: 0.65, color: 'rgba(30, 136, 229, 0.45)' },
+            { amplitude: 55, frequency: 0.018, speed: 0.03,  yPos: 0.55, color: 'rgba(66, 165, 245, 0.38)' },
+            { amplitude: 50, frequency: 0.022, speed: 0.025, yPos: 0.45, color: 'rgba(100, 181, 246, 0.30)' },
+            { amplitude: 45, frequency: 0.016, speed: 0.02,  yPos: 0.35, color: 'rgba(144, 202, 249, 0.22)' }
         ];
     }
     
@@ -66,48 +67,30 @@ class WaterAnimation {
     
     drawWaves() {
         const step = Math.max(2, Math.floor(this.canvas.width / 400));
-        
+        const height = this.canvas.height;
+        const width = this.canvas.width;
+
+        // Draw each wave layer from its crest down to the canvas bottom
         this.waves.forEach(wave => {
+            const baseY = height * wave.yPos;
+
             this.ctx.beginPath();
             this.ctx.fillStyle = wave.color;
-            
-            // Start from top
-            this.ctx.moveTo(0, 0);
-            
-            // Draw wavy line
-            for (let x = 0; x <= this.canvas.width; x += step) {
-                const y = wave.offset + 
+
+            // Start at bottom-left
+            this.ctx.moveTo(0, height);
+
+            // Draw wave surface left to right
+            for (let x = 0; x <= width; x += step) {
+                const phaseOffset = 1; // phase shift between the two sine components for a natural wave shape
+                const y = baseY +
                     Math.sin((x * wave.frequency) + (this.time * wave.speed)) * wave.amplitude +
-                    Math.sin((x * wave.frequency * 0.5) + (this.time * wave.speed * 1.5)) * (wave.amplitude * 0.5);
+                    Math.sin((x * wave.frequency * 0.7) + (this.time * wave.speed * 1.3) + phaseOffset) * (wave.amplitude * 0.4);
                 this.ctx.lineTo(x, y);
             }
-            
-            // Complete the fill
-            this.ctx.lineTo(this.canvas.width, 0);
-            this.ctx.closePath();
-            this.ctx.fill();
-        });
-        
-        // Draw bottom waves (inverted)
-        this.waves.forEach((wave, index) => {
-            this.ctx.beginPath();
-            this.ctx.fillStyle = wave.color;
-            
-            const bottomOffset = this.canvas.height - wave.offset - 100;
-            
-            // Start from bottom
-            this.ctx.moveTo(0, this.canvas.height);
-            
-            // Draw wavy line
-            for (let x = 0; x <= this.canvas.width; x += step) {
-                const y = bottomOffset - 
-                    Math.sin((x * wave.frequency) + (this.time * wave.speed * 0.8)) * wave.amplitude +
-                    Math.sin((x * wave.frequency * 0.7) + (this.time * wave.speed * 1.2)) * (wave.amplitude * 0.5);
-                this.ctx.lineTo(x, y);
-            }
-            
-            // Complete the fill
-            this.ctx.lineTo(this.canvas.width, this.canvas.height);
+
+            // Complete the fill down to bottom-right
+            this.ctx.lineTo(width, height);
             this.ctx.closePath();
             this.ctx.fill();
         });
@@ -145,20 +128,20 @@ class WaterAnimation {
     }
     
     drawBubbles() {
-        // Draw floating bubbles influenced by mouse
-        const bubbleCount = 5;
+        // Draw floating bubbles distributed across the canvas
+        const bubbleCount = 12;
         for (let i = 0; i < bubbleCount; i++) {
-            const x = (this.canvas.width / bubbleCount) * i + 
-                Math.sin(this.time * 0.02 + i) * 50;
-            const y = this.canvas.height * 0.5 + 
-                Math.sin(this.time * 0.03 + i * 2) * 100;
-            const radius = 3 + Math.sin(this.time * 0.05 + i) * 2;
-            
+            const x = (this.canvas.width / bubbleCount) * i +
+                Math.sin(this.time * 0.02 + i) * 40;
+            const yBase = this.canvas.height * (0.3 + (i % 4) * 0.15);
+            const y = yBase + Math.sin(this.time * 0.025 + i * 1.5) * 60;
+            const radius = 4 + Math.sin(this.time * 0.05 + i) * 3;
+
             // Calculate distance from mouse
             const dx = this.mouse.x - x;
             const dy = this.mouse.y - y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            
+
             // Bubble moves away from mouse
             let offsetX = 0;
             let offsetY = 0;
@@ -167,13 +150,13 @@ class WaterAnimation {
                 offsetX = -(dx / distance) * force * 30;
                 offsetY = -(dy / distance) * force * 30;
             }
-            
+
             this.ctx.beginPath();
             this.ctx.arc(x + offsetX, y + offsetY, radius, 0, Math.PI * 2);
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
             this.ctx.fill();
-            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-            this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+            this.ctx.lineWidth = 1.5;
             this.ctx.stroke();
         }
     }
@@ -181,9 +164,9 @@ class WaterAnimation {
     animate() {
         // Clear canvas with gradient background
         const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-        gradient.addColorStop(0, '#e3f2fd');
-        gradient.addColorStop(0.5, '#bbdefb');
-        gradient.addColorStop(1, '#90caf9');
+        gradient.addColorStop(0, '#b3e5fc');
+        gradient.addColorStop(0.5, '#81d4fa');
+        gradient.addColorStop(1, '#4fc3f7');
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         

@@ -11,14 +11,15 @@ body {
     position: relative;
 }
 
-#vanta-bg {
+/* Water Canvas Background */
+#water-canvas {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: -1;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    pointer-events: none;
 }
 
 .container {

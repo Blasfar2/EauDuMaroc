@@ -1,3 +1,194 @@
+// Water Animation Canvas
+class WaterAnimation {
+    constructor() {
+        this.canvas = document.getElementById('water-canvas');
+        if (!this.canvas) {
+            console.error('water-canvas element not found');
+            return;
+        }
+        this.ctx = this.canvas.getContext('2d');
+        this.waves = [];
+        this.ripples = [];
+        this.mouse = { x: 0, y: 0 };
+        this.time = 0;
+        
+        this.resize();
+        this.initWaves();
+        this.setupEventListeners();
+        this.animate();
+    }
+    
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+    
+    initWaves() {
+        // Create multiple wave layers for depth - each fills from wave crest to bottom
+        this.waves = [
+            { amplitude: 70, frequency: 0.015, speed: 0.05,  yPos: 0.75, color: 'rgba(21, 101, 192, 0.55)' },
+            { amplitude: 60, frequency: 0.02,  speed: 0.04,  yPos: 0.65, color: 'rgba(30, 136, 229, 0.45)' },
+            { amplitude: 55, frequency: 0.018, speed: 0.03,  yPos: 0.55, color: 'rgba(66, 165, 245, 0.38)' },
+            { amplitude: 50, frequency: 0.022, speed: 0.025, yPos: 0.45, color: 'rgba(100, 181, 246, 0.30)' },
+            { amplitude: 45, frequency: 0.016, speed: 0.02,  yPos: 0.35, color: 'rgba(144, 202, 249, 0.22)' }
+        ];
+    }
+    
+    setupEventListeners() {
+        window.addEventListener('resize', () => this.resize());
+        
+        // Mouse move creates ripples
+        document.addEventListener('mousemove', (e) => {
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+            
+            // Create ripple on mouse move (throttled)
+            if (Math.random() > 0.95) {
+                this.createRipple(e.clientX, e.clientY);
+            }
+        });
+        
+        // Click creates bigger ripples
+        document.addEventListener('click', (e) => {
+            this.createRipple(e.clientX, e.clientY, 80, 0.3);
+        });
+    }
+    
+    createRipple(x, y, maxRadius = 50, opacity = 0.2) {
+        this.ripples.push({
+            x: x,
+            y: y,
+            radius: 0,
+            maxRadius: maxRadius,
+            opacity: opacity,
+            speed: 2
+        });
+    }
+    
+    drawWaves() {
+        const step = Math.max(2, Math.floor(this.canvas.width / 400));
+        const height = this.canvas.height;
+        const width = this.canvas.width;
+
+        // Draw each wave layer from its crest down to the canvas bottom
+        this.waves.forEach(wave => {
+            const baseY = height * wave.yPos;
+
+            this.ctx.beginPath();
+            this.ctx.fillStyle = wave.color;
+
+            // Start at bottom-left
+            this.ctx.moveTo(0, height);
+
+            // Draw wave surface left to right
+            for (let x = 0; x <= width; x += step) {
+                const phaseOffset = 1; // phase shift between the two sine components for a natural wave shape
+                const y = baseY +
+                    Math.sin((x * wave.frequency) + (this.time * wave.speed)) * wave.amplitude +
+                    Math.sin((x * wave.frequency * 0.7) + (this.time * wave.speed * 1.3) + phaseOffset) * (wave.amplitude * 0.4);
+                this.ctx.lineTo(x, y);
+            }
+
+            // Complete the fill down to bottom-right
+            this.ctx.lineTo(width, height);
+            this.ctx.closePath();
+            this.ctx.fill();
+        });
+    }
+    
+    drawRipples() {
+        this.ripples = this.ripples.filter(ripple => {
+            // Draw ripple
+            const currentOpacity = ripple.opacity * (1 - ripple.radius / ripple.maxRadius);
+            
+            if (currentOpacity > 0.01) {
+                this.ctx.beginPath();
+                this.ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
+                this.ctx.strokeStyle = `rgba(66, 165, 245, ${currentOpacity})`;
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+                
+                // Inner ripple
+                if (ripple.radius > 10) {
+                    this.ctx.beginPath();
+                    this.ctx.arc(ripple.x, ripple.y, ripple.radius - 10, 0, Math.PI * 2);
+                    this.ctx.strokeStyle = `rgba(3, 169, 244, ${currentOpacity * 0.5})`;
+                    this.ctx.lineWidth = 1;
+                    this.ctx.stroke();
+                }
+                
+                // Expand ripple
+                ripple.radius += ripple.speed;
+                
+                return true;
+            }
+            
+            return false;
+        });
+    }
+    
+    drawBubbles() {
+        // Draw floating bubbles distributed across the canvas
+        const bubbleCount = 12;
+        for (let i = 0; i < bubbleCount; i++) {
+            const x = (this.canvas.width / bubbleCount) * i +
+                Math.sin(this.time * 0.02 + i) * 40;
+            const yBase = this.canvas.height * (0.3 + (i % 4) * 0.15);
+            const y = yBase + Math.sin(this.time * 0.025 + i * 1.5) * 60;
+            const radius = 4 + Math.sin(this.time * 0.05 + i) * 3;
+
+            // Calculate distance from mouse
+            const dx = this.mouse.x - x;
+            const dy = this.mouse.y - y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // Bubble moves away from mouse
+            let offsetX = 0;
+            let offsetY = 0;
+            if (distance > 0 && distance < 200) {
+                const force = (200 - distance) / 200;
+                offsetX = -(dx / distance) * force * 30;
+                offsetY = -(dy / distance) * force * 30;
+            }
+
+            this.ctx.beginPath();
+            this.ctx.arc(x + offsetX, y + offsetY, radius, 0, Math.PI * 2);
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            this.ctx.fill();
+            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+            this.ctx.lineWidth = 1.5;
+            this.ctx.stroke();
+        }
+    }
+    
+    animate() {
+        // Clear canvas with gradient background
+        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+        gradient.addColorStop(0, '#b3e5fc');
+        gradient.addColorStop(0.5, '#81d4fa');
+        gradient.addColorStop(1, '#4fc3f7');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw all elements
+        this.drawWaves();
+        this.drawBubbles();
+        this.drawRipples();
+        
+        // Increment time
+        this.time += 1;
+        
+        // Continue animation
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+// Initialize water animation when DOM is ready
+let waterAnimation;
+window.addEventListener('DOMContentLoaded', () => {
+    waterAnimation = new WaterAnimation();
+});
+
 // Product Database with Enhanced Information
 const products = [
     {

@@ -4,9 +4,10 @@ An e-commerce website for water filtration systems in Morocco, featuring osmosis
 
 ## 🌐 Live Demo
 
-**[View Live Website](https://blasfar2.github.io/EauDuMaroc/)** *(Deploy via GitHub Pages to activate)*
+**[View Live Website](https://blasfar2.github.io/EauDuMaroc/)**
 
-> To enable the live website: Go to Repository Settings → Pages → Source: Select branch → Save
+> The website is automatically deployed to GitHub Pages when changes are pushed to the main branch.
+> GitHub Actions workflow handles the deployment process automatically.
 
 ## Features
 
@@ -57,8 +58,8 @@ npx http-server
 ```
 
 ### Option 3: Deploy Online
-Deploy to any static hosting service:
-- **GitHub Pages**: Enable in repository settings
+The main branch is automatically deployed to GitHub Pages via GitHub Actions.
+For other deployment options:
 - **Netlify**: Drag and drop the files
 - **Vercel**: Connect your repository
 - **Cloudflare Pages**: Connect and deploy

@@ -478,29 +478,123 @@ function setupCartLink() {
     checkoutBtn.addEventListener('click', checkout);
 }
 
-// Checkout
+// Detect the main product type in the cart
+function detectCartProductType() {
+    if (cart.length === 0) return 'autre';
+    const typeCounts = {};
+    cart.forEach(item => {
+        typeCounts[item.type] = (typeCounts[item.type] || 0) + item.quantity;
+    });
+    const dominant = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0][0];
+    const typeMap = {
+        osmoseur: 'osmose-inverse',
+        filtre: 'filtre',
+        cartouche: 'cartouche',
+        accessoire: 'accessoire'
+    };
+    return typeMap[dominant] || 'autre';
+}
+
+// Checkout — shows an order form so customers can specify their solution type
 function checkout() {
     if (cart.length === 0) {
         showNotification('Votre panier est vide!');
         return;
     }
-    
+
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const itemText = itemCount > 1 ? 'articles' : 'article';
-    
-    // Show success notification
-    showNotification(`✅ Commande confirmée! Total: ${total} MAD (${itemCount} ${itemText}). Nous vous contactons bientôt!`);
-    
-    // Clear cart after a brief delay to allow user to see the notification
-    setTimeout(() => {
-        cart = [];
-        updateCart();
-        saveCartToStorage();
-        // Hide cart section
-        const cartSection = document.getElementById('panier-details');
-        cartSection.style.display = 'none';
-    }, 2000);
+    const detectedType = detectCartProductType();
+
+    const modal = document.createElement('div');
+    modal.className = 'checkout-modal';
+    modal.innerHTML = `
+        <div class="checkout-modal-content">
+            <span class="modal-close" onclick="this.closest('.checkout-modal').remove()">&times;</span>
+            <h2>🛒 Finaliser la Commande</h2>
+            <p class="checkout-summary">Total: <strong>${total} MAD</strong> — ${cart.reduce((sum, item) => sum + item.quantity, 0)} article(s)</p>
+            <form id="checkout-form">
+                <div class="checkout-field">
+                    <label for="co-name">Nom complet *</label>
+                    <input type="text" id="co-name" placeholder="Votre nom" required>
+                </div>
+                <div class="checkout-field">
+                    <label for="co-phone">Téléphone *</label>
+                    <input type="tel" id="co-phone" placeholder="+212 6XX-XXXXXX" required>
+                </div>
+                <div class="checkout-field">
+                    <label for="co-email">Email</label>
+                    <input type="email" id="co-email" placeholder="votre@email.ma">
+                </div>
+                <div class="checkout-field">
+                    <label for="co-city">Ville *</label>
+                    <select id="co-city" required>
+                        <option value="">-- Sélectionner votre ville --</option>
+                        <option value="casablanca">Casablanca</option>
+                        <option value="rabat">Rabat</option>
+                        <option value="marrakech">Marrakech</option>
+                        <option value="fes">Fès</option>
+                        <option value="tanger">Tanger</option>
+                        <option value="agadir">Agadir</option>
+                        <option value="autre">Autre ville</option>
+                    </select>
+                </div>
+                <div class="checkout-field">
+                    <label for="co-type">Type de solution souhaitée *</label>
+                    <select id="co-type" required>
+                        <option value="">-- Sélectionner le type --</option>
+                        <option value="osmose-inverse" ${detectedType === 'osmose-inverse' ? 'selected' : ''}>Osmose Inverse</option>
+                        <option value="filtre" ${detectedType === 'filtre' ? 'selected' : ''}>Filtre à Eau</option>
+                        <option value="cartouche" ${detectedType === 'cartouche' ? 'selected' : ''}>Cartouche</option>
+                        <option value="accessoire" ${detectedType === 'accessoire' ? 'selected' : ''}>Accessoire</option>
+                        <option value="autre" ${detectedType === 'autre' ? 'selected' : ''}>Autre</option>
+                    </select>
+                </div>
+                <div class="checkout-field">
+                    <label for="co-notes">Notes / Informations complémentaires</label>
+                    <textarea id="co-notes" rows="3" placeholder="Type d'eau, espace disponible, questions..."></textarea>
+                </div>
+                <div class="checkout-actions">
+                    <button type="button" class="btn-cancel-checkout" onclick="this.closest('.checkout-modal').remove()">Annuler</button>
+                    <button type="submit" class="btn-confirm-checkout">✅ Confirmer la Commande</button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Close on outside click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) modal.remove();
+    });
+
+    // Form submission
+    modal.querySelector('#checkout-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = modal.querySelector('#co-name').value.trim();
+        const phone = modal.querySelector('#co-phone').value.trim();
+        const city = modal.querySelector('#co-city').value;
+        const type = modal.querySelector('#co-type').value;
+
+        if (!name || !phone || !city || !type) {
+            showNotification('⚠️ Veuillez remplir tous les champs obligatoires (*).');
+            return;
+        }
+
+        modal.remove();
+
+        const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const itemText = itemCount > 1 ? 'articles' : 'article';
+        showNotification(`✅ Commande confirmée! Total: ${total} MAD (${itemCount} ${itemText}). Nous vous contactons bientôt, ${name}!`);
+
+        setTimeout(() => {
+            cart = [];
+            updateCart();
+            saveCartToStorage();
+            const cartSection = document.getElementById('panier-details');
+            cartSection.style.display = 'none';
+        }, 2000);
+    });
 }
 
 // Show notification
